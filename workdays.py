@@ -33,7 +33,7 @@ def _in_between(a,b,x):
 def cmp(a, b):
     return (a > b) - (a < b)
 
-def workday(start_date, days=0, holidays=[], weekends=default_weekends):
+def workday(start_date, days=0, holidays=[], weekends=default_weekends, count_holiday_on_start=False):
     if days== 0:
         return start_date;
     if days>0 and start_date.weekday() in weekends: #
@@ -57,7 +57,10 @@ def workday(start_date, days=0, holidays=[], weekends=default_weekends):
         delta = timedelta(days=1 * cmp(days,0))
         # skip holidays that fall on weekends
         holidays =  [x for x in holidays if x.weekday() not in weekends ]
-        holidays =  [x for x in holidays if x != start_date ]
+        # This library normally doesn't count a holiday if it falls on the start date
+        # If the flag count_holiday_on_start is True though, do count it
+        if not count_holiday_on_start:
+            holidays =  [x for x in holidays if x != start_date ]
         for d in sorted(holidays, reverse = (days < 0)):
             # if d in between start and current push it out one working day
             if _in_between(start_date, new_date, d):
